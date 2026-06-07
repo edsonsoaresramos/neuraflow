@@ -30,10 +30,10 @@ class ProcessAnalysisResponse(BaseModel):
     risks: List[str]
     estimated_benefits: List[str]
     recommended_technologies: List[str]
-
     automation_score: int
     roi_potential: str
     implementation_complexity: str
+    priority: str
 
 
 @app.get("/")
@@ -87,6 +87,24 @@ Low, Medium or High.
 
 Implementation Complexity:
 Low, Medium or High.
+Priority:
+
+Immediate
+Short Term
+Medium Term
+Long Term
+
+Immediate:
+High ROI and high automation potential.
+
+Short Term:
+Good ROI but requires some preparation.
+
+Medium Term:
+Moderate ROI or complexity.
+
+Long Term:
+Low ROI or high complexity.
 
 Focus on operational efficiency, automation and business value.
 """
