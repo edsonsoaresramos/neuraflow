@@ -15,6 +15,11 @@ app = FastAPI(title="NeuraFlow API")
 class AnalyzeRequest(BaseModel):
     text: str
 
+class ResourceAnalysisRequest(BaseModel):
+    resource: str
+    allocated_hours: int
+    active_projects: int 
+
 
 class AnalysisResponse(BaseModel):
     summary: str
@@ -35,6 +40,11 @@ class ProcessAnalysisResponse(BaseModel):
     implementation_complexity: str
     priority: str
 
+
+class ResourceAnalysisResponse(BaseModel):
+    risk: str
+    reason: List[str]
+    recommendations: List[str]    
 
 @app.get("/")
 async def root():
@@ -115,6 +125,59 @@ Focus on operational efficiency, automation and business value.
             }
         ],
         response_format=ProcessAnalysisResponse,
+    )
+
+    analysis = response.choices[0].message.parsed
+
+    return analysis
+
+
+
+@app.post(
+    "/resource-analysis",
+    response_model=ResourceAnalysisResponse
+)
+async def resource_analysis(
+    request: ResourceAnalysisRequest
+):
+
+    response = client.beta.chat.completions.parse(
+        model="gpt-4.1-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a senior resource planning analyst.
+
+Analyze resource workload information.
+
+Return:
+
+- Risk (Low, Medium, High)
+- Reason
+- Recommendations
+
+Consider:
+
+- Allocated hours
+- Number of active projects
+- Resource workload
+
+Provide practical recommendations for managers.
+"""
+            },
+            {
+                "role": "user",
+                "content": f"""
+Resource: {request.resource}
+
+Allocated Hours: {request.allocated_hours}
+
+Active Projects: {request.active_projects}
+"""
+            }
+        ],
+        response_format=ResourceAnalysisResponse,
     )
 
     analysis = response.choices[0].message.parsed
